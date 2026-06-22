@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import httpx
 
@@ -7,7 +7,7 @@ from deep_researcher.state import Citation
 
 
 class TavilySearchClient:
-    """Small Tavily Search API wrapper."""
+    """Small Tavily Search API wrapper with safe fallbacks."""
 
     endpoint = "https://api.tavily.com/search"
 
@@ -25,10 +25,14 @@ class TavilySearchClient:
             "include_raw_content": False,
             "max_results": max_results or self.settings.max_search_results,
         }
-        with httpx.Client(timeout=self.settings.request_timeout_seconds) as client:
-            response = client.post(self.endpoint, json=payload)
-            response.raise_for_status()
-            data = response.json()
+        try:
+            with httpx.Client(timeout=self.settings.request_timeout_seconds) as client:
+                response = client.post(self.endpoint, json=payload)
+                response.raise_for_status()
+                data = response.json()
+        except (httpx.HTTPError, ValueError, TypeError):
+            return []
+
         results: list[Citation] = []
         for item in data.get("results", []):
             results.append(
