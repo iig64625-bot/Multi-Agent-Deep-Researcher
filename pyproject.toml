@@ -1,0 +1,31 @@
+[project]
+name = "agentic-deep-researcher"
+version = "0.1.0"
+description = "Multi-agent deep research assistant with LangGraph, Streamlit, Tavily, and OpenAI-compatible LLM APIs."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.12.3",
+    "httpx>=0.27.0",
+    "langchain>=0.3.0",
+    "langchain-core>=0.3.0",
+    "langchain-openai>=0.2.0",
+    "langgraph>=0.2.60",
+    "python-dotenv>=1.0.1",
+    "streamlit>=1.37.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3.0", "ruff>=0.6.0"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
