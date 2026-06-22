@@ -46,8 +46,16 @@ def _fallback_report(state: ResearchState) -> str:
 
 def writer_node(state: ResearchState) -> ResearchState:
     settings: Settings = state.get("settings") or load_settings()
+    rewrite_count = state.get("rewrite_count", 0)
+    next_rewrite_count = rewrite_count + 1 if state.get("critic") else rewrite_count
     plan_text = "\n".join(f"- {item}" for item in state.get("plan", []))
     synthesis = state.get("synthesis") or plan_text
+    if state.get("critic"):
+        synthesis = (
+            f"{synthesis}\n\n上一版 Critic 反馈：{state['critic']}\n"
+            "请基于反馈改写报告，优先补足结构、引用说明和行动建议。"
+        )
+
     try:
         response = get_llm(temperature=0.3, settings=settings).invoke(
             WRITER_PROMPT.format(
@@ -61,6 +69,14 @@ def writer_node(state: ResearchState) -> ResearchState:
         report = _fallback_report({**state, "synthesis": synthesis})
         return {
             "report": report,
-            "messages": state.get("messages", []) + [f"Writer fallback: {exc}"],
+            "rewrite_count": next_rewrite_count,
+            "messages": [
+                *state.get("messages", []),
+                f"Writer fallback due to {type(exc).__name__}: {exc}",
+            ],
         }
-    return {"report": report, "messages": state.get("messages", []) + ["Writer completed"]}
+    return {
+        "report": report,
+        "rewrite_count": next_rewrite_count,
+        "messages": state.get("messages", []) + ["Writer completed"],
+    }

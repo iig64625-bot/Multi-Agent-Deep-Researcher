@@ -3,7 +3,14 @@ from deep_researcher.config import Settings
 
 
 def test_researcher_node_fallback_without_tavily_key():
-    result = researcher_node({"question": "AI Agent", "plan": ["背景是什么？"], "messages": []})
+    result = researcher_node(
+        {
+            "question": "AI Agent",
+            "plan": ["背景是什么？"],
+            "settings": Settings(openai_api_key="", tavily_api_key=""),
+            "messages": [],
+        }
+    )
 
     assert result["findings"][0]["subquestion"] == "背景是什么？"
     assert result["citations"] == []

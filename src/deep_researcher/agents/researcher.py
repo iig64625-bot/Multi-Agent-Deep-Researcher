@@ -67,7 +67,10 @@ def researcher_node(state: ResearchState) -> ResearchState:
                     f"- {source.get('title', 'Untitled')}：{source.get('snippet', '')[:300]}"
                     for source in enriched
                 )
-                messages.append(f"Researcher summary fallback for '{subquestion}': {exc}")
+                messages.append(
+                    f"Researcher summary fallback due to {type(exc).__name__} "
+                    f"for '{subquestion}': {exc}"
+                )
         findings.append({"subquestion": subquestion, "summary": summary, "sources": enriched})
 
     messages.append(f"Researcher completed with {len(citations)} citations")

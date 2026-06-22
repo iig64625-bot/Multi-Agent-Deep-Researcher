@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from typing import Any, TypedDict
 
@@ -33,4 +33,5 @@ class ResearchState(TypedDict, total=False):
     report: str
     critic: CriticReview
     messages: list[str]
+    rewrite_count: int
     settings: Any

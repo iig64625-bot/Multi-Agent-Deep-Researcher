@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from langgraph.graph import END, StateGraph
 
@@ -9,6 +9,15 @@ from deep_researcher.agents.synthesizer import synthesizer_node
 from deep_researcher.agents.writer import writer_node
 from deep_researcher.config import Settings, load_settings
 from deep_researcher.state import ResearchState
+
+
+def should_rewrite(state: ResearchState) -> str:
+    settings: Settings = state.get("settings") or load_settings()
+    score = int(state.get("critic", {}).get("score", 0))
+    rewrite_count = state.get("rewrite_count", 0)
+    if score < 7 and rewrite_count < settings.max_rewrites:
+        return "rewrite"
+    return "end"
 
 
 def build_graph():
@@ -24,7 +33,7 @@ def build_graph():
     graph.add_edge("researcher", "synthesizer")
     graph.add_edge("synthesizer", "writer")
     graph.add_edge("writer", "critic")
-    graph.add_edge("critic", END)
+    graph.add_conditional_edges("critic", should_rewrite, {"rewrite": "writer", "end": END})
     return graph.compile()
 
 
@@ -33,6 +42,7 @@ def run_research(question: str, settings: Settings | None = None) -> ResearchSta
     initial_state: ResearchState = {
         "question": question,
         "settings": config,
+        "rewrite_count": 0,
         "messages": ["Workflow started"],
     }
     return build_graph().invoke(initial_state)

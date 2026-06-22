@@ -30,6 +30,7 @@ def critic_node(state: ResearchState) -> ResearchState:
         }
         return {
             "critic": review,
-            "messages": state.get("messages", []) + [f"Critic fallback: {exc}"],
+            "messages": state.get("messages", [])
+            + [f"Critic fallback due to {type(exc).__name__}: {exc}"],
         }
     return {"critic": review, "messages": state.get("messages", []) + ["Critic completed"]}

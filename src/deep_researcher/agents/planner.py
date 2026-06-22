@@ -23,7 +23,9 @@ def planner_node(state: ResearchState) -> ResearchState:
             f"{question} 的主要风险、争议和限制是什么？",
             f"{question} 的未来趋势与行动建议是什么？",
         ][:max_items]
-        messages = state.get("messages", []) + [f"Planner fallback: {exc}"]
+        messages = state.get("messages", []) + [
+            f"Planner fallback due to {type(exc).__name__}: {exc}"
+        ]
         return {"plan": plan, "messages": messages}
 
     result: ResearchState = {"plan": plan or [question]}

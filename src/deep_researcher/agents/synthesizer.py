@@ -25,7 +25,8 @@ def synthesizer_node(state: ResearchState) -> ResearchState:
         synthesis = fallback or "暂无可综合的研究发现。"
         return {
             "synthesis": synthesis,
-            "messages": state.get("messages", []) + [f"Synthesizer fallback: {exc}"],
+            "messages": state.get("messages", [])
+            + [f"Synthesizer fallback due to {type(exc).__name__}: {exc}"],
         }
     return {
         "synthesis": synthesis,
